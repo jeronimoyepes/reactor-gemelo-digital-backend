@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  reactor-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: reactor-backend-prod
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8080
+      - DEBUG=false
+      - RELOADER=false
+      - DB_PATH=/app/data/users.db
+      - DEFAULT_ADMIN_USERNAME=${DEFAULT_ADMIN_USERNAME:-admin}
+      - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD}
+      - SESSION_EXPIRY_HOURS=${SESSION_EXPIRY_HOURS:-24}
+      - TOKEN_LENGTH=${TOKEN_LENGTH:-32}
+    volumes:
+      - ./data:/app/data:rw
+      - ./logs:/app/logs:rw
+    user: "1000:1000"
+    read_only: false
+    tmpfs:
+      - /tmp
+      - /var/tmp
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3" 
