@@ -7,6 +7,16 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Debugging support - enable when DEBUG_PYTHON=true
+debug_python = os.getenv('DEBUG_PYTHON', 'false').lower() == 'true'
+if debug_python:
+    import debugpy
+    debugpy.listen(("0.0.0.0", 5679))
+    print("⏳ Debugger is listening on 0.0.0.0:5679")
+    if os.getenv('DEBUG_WAIT', 'false').lower() == 'true':
+        debugpy.wait_for_client()
+        print("🔗 Debugger is attached!")
+
 app = Bottle()
 
 # Authentication decorator
@@ -82,11 +92,17 @@ if __name__ == '__main__':
     host = os.getenv('HOST', 'localhost')
     port = int(os.getenv('PORT', '8080'))
     debug = os.getenv('DEBUG', 'true').lower() == 'true'
-    reloader = os.getenv('RELOADER', 'true').lower() == 'true'
+    
+    # Force reloader to be disabled when debugging to prevent port conflicts
+    reloader = False if debug_python else os.getenv('RELOADER', 'true').lower() == 'true'
     
     admin_username = os.getenv('DEFAULT_ADMIN_USERNAME', 'admin')
     admin_password = os.getenv('DEFAULT_ADMIN_PASSWORD', 'admin123')
     
     print(f"Database initialized with admin user (username: {admin_username}, password: {admin_password})")
     print(f"Starting server on http://{host}:{port}")
+    print(f"Debug mode: {debug}")
+    print(f"Reloader enabled: {reloader}")
+    print(f"Python debugging: {debug_python}")
+    
     app.run(host=host, port=port, debug=debug, reloader=reloader) 

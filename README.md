@@ -187,3 +187,8 @@ curl -X POST http://localhost:8080/logout \
 # Health check
 curl -X GET http://localhost:8080/health
 ``` 
+
+Copy database from docker image to root:
+```bash
+docker cp reactor-backend:/app/users.db ./users.db
+```

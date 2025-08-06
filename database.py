@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any, List
 from dotenv import load_dotenv
+from helpers import hash_string
 
 # Load environment variables
 load_dotenv()
@@ -46,8 +47,12 @@ class DatabaseManager:
         ''')
         
         # Create default admin user if it doesn't exist
-        admin_username = os.getenv('DEFAULT_ADMIN_USERNAME', 'admin')
-        admin_password = os.getenv('DEFAULT_ADMIN_PASSWORD', 'admin123')
+        admin_username = os.getenv('DEFAULT_ADMIN_USERNAME')
+        admin_password = os.getenv('DEFAULT_ADMIN_PASSWORD')
+
+        # Verify that admin_username and admin_password are set
+        if not admin_username or not admin_password:
+            raise Exception("DEFAULT_ADMIN_USERNAME and DEFAULT_ADMIN_PASSWORD must be set in environment variables.")
         
         if not self.get_user_by_username(admin_username):
             self.create_user(admin_username, admin_password)
@@ -57,7 +62,7 @@ class DatabaseManager:
     
     def create_user(self, username: str, password: str) -> int:
         """Create a new user and return the user ID"""
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        password_hash = hash_string(password)
         
         conn = self.get_connection()
         cursor = conn.cursor()
@@ -99,7 +104,7 @@ class DatabaseManager:
     
     def authenticate_user(self, username: str, password: str) -> Optional[int]:
         """Authenticate user and return user ID if successful"""
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        password_hash = hash_string(password)
         
         conn = self.get_connection()
         cursor = conn.cursor()

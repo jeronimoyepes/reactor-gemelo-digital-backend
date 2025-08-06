@@ -4,6 +4,7 @@ services:
     container_name: reactor-backend
     ports:
       - "${PORT:-8080}:8080"
+      - "5679:5679"  # Debug port
     environment:
       - HOST=0.0.0.0
       - PORT=8080
@@ -14,6 +15,8 @@ services:
       - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-admin123}
       - SESSION_EXPIRY_HOURS=${SESSION_EXPIRY_HOURS:-24}
       - TOKEN_LENGTH=${TOKEN_LENGTH:-32}
+      - DEBUG_PYTHON=${DEBUG_PYTHON:-false}
+      - DEBUG_WAIT=${DEBUG_WAIT:-false}
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
