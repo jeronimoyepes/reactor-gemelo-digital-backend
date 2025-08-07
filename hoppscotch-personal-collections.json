@@ -1,0 +1,756 @@
+[
+  {
+    "v": 9,
+    "name": "Reactor Simulation API",
+    "folders": [
+      {
+        "v": 9,
+        "name": "Authentication",
+        "folders": [],
+        "requests": [
+          {
+            "v": "15",
+            "name": "Login",
+            "endpoint": "<<base_url>>/login",
+            "method": "POST",
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n    \"username\": <<username>>,\n    \"password\": <<password>>\n}"
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"token\": \"your_jwt_token_here\",\n    \"expires_at\": \"2024-01-01T12:00:00\",\n    \"message\": \"Login successful\"\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": "application/json",
+                    "body": "{\n    \"username\": \"admin\",\n    \"password\": \"your_secure_password\"\n}"
+                  },
+                  "endpoint": "<<base_url>>/login",
+                  "headers": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "POST",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": "export {};\n\n\n// Set an environment variable\npw.env.set(\"auth_token\", pw.response.body.token);"
+          },
+          {
+            "v": "15",
+            "name": "Logout",
+            "endpoint": "<<base_url>>/logout",
+            "method": "POST",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<auth_token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"message\": \"Logout successful\"\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": null,
+                    "body": null
+                  },
+                  "endpoint": "<<base_url>>/logout",
+                  "headers": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer <<auth_token>>",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "POST",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          },
+          {
+            "v": "15",
+            "name": "Get Profile",
+            "endpoint": "<<base_url>>/profile",
+            "method": "GET",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<auth_token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"username\": \"admin\",\n    \"created_at\": \"2024-01-01T10:00:00\"\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": null,
+                    "body": null
+                  },
+                  "endpoint": "<<base_url>>/profile",
+                  "headers": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer <<auth_token>>",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "GET",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": [],
+        "_ref_id": "coll_me0ubjgf_cd6a2bb5-0561-44e4-bb87-6bb1865d537d"
+      },
+      {
+        "v": 9,
+        "name": "Reactor Experiments",
+        "folders": [],
+        "requests": [
+          {
+            "v": "15",
+            "name": "Upload Experiment",
+            "endpoint": "<<base_url>>/reactor/upload",
+            "method": "POST",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<auth_token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "multipart/form-data",
+              "body": [
+                {
+                  "key": "experiment_name",
+                  "value": "My Reactor Experiment",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "excel_file",
+                  "value": "",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "t_add",
+                  "value": "7380.0",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "t_span_start",
+                  "value": "0.0",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "t_span_end",
+                  "value": "13100.0",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "dt",
+                  "value": "1.0",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "f_j1",
+                  "value": "0.05",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "f_j2",
+                  "value": "10.0",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "L_0i",
+                  "value": "0.25",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "CVAM_r0i",
+                  "value": "1e-10",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "CBA_r0i",
+                  "value": "1e-10",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "CNaPS_r0i",
+                  "value": "0.0007",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "CTBHP_r0i",
+                  "value": "0.00042",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "CCRD_r0i",
+                  "value": "0.00066",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "CMPOL_r0i",
+                  "value": "1e-10",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "Np_r0i",
+                  "value": "1e-10",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "T1_0i",
+                  "value": "296.15",
+                  "active": true,
+                  "isFile": false
+                },
+                {
+                  "key": "T3_0i",
+                  "value": "295.15",
+                  "active": true,
+                  "isFile": false
+                }
+              ]
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"experiment_id\": 1,\n    \"experiment_name\": \"My Reactor Experiment\",\n    \"status\": \"pending\",\n    \"message\": \"Experiment uploaded successfully and queued for processing\"\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": "multipart/form-data",
+                    "body": [
+                      {
+                        "key": "experiment_name",
+                        "value": "My Reactor Experiment",
+                        "active": true,
+                        "isFile": false
+                      },
+                      {
+                        "key": "excel_file",
+                        "value": "",
+                        "active": true,
+                        "isFile": false
+                      }
+                    ]
+                  },
+                  "endpoint": "<<base_url>>/reactor/upload",
+                  "headers": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer <<auth_token>>",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "POST",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          },
+          {
+            "v": "15",
+            "name": "Get User Experiments",
+            "endpoint": "<<base_url>>/reactor/experiments",
+            "method": "GET",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<auth_token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"experiments\": [\n        {\n            \"id\": 1,\n            \"experiment_name\": \"My Reactor Experiment\",\n            \"status\": \"completed\",\n            \"number_of_tries\": 1,\n            \"created_at\": \"2024-01-01T10:00:00\",\n            \"started_at\": \"2024-01-01T10:01:00\",\n            \"completed_at\": \"2024-01-01T10:02:30\"\n        },\n        {\n            \"id\": 2,\n            \"experiment_name\": \"Another Experiment\",\n            \"status\": \"pending\",\n            \"number_of_tries\": 0,\n            \"created_at\": \"2024-01-01T11:00:00\",\n            \"started_at\": null,\n            \"completed_at\": null\n        }\n    ]\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": null,
+                    "body": null
+                  },
+                  "endpoint": "<<base_url>>/reactor/experiments",
+                  "headers": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer <<auth_token>>",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "GET",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          },
+          {
+            "v": "15",
+            "name": "Get Experiment Details",
+            "endpoint": "<<base_url>>/reactor/experiments/<<experiment_id>>",
+            "method": "GET",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<auth_token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"experiment\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"experiment_name\": \"My Reactor Experiment\",\n        \"excel_file_path\": \"uploads/abc123.xlsx\",\n        \"status\": \"completed\",\n        \"number_of_tries\": 1,\n        \"created_at\": \"2024-01-01T10:00:00\",\n        \"started_at\": \"2024-01-01T10:01:00\",\n        \"completed_at\": \"2024-01-01T10:02:30\",\n        \"error_message\": null\n    },\n    \"parameters\": {\n        \"t_add\": 7380.0,\n        \"adj_factor\": [0.05, 10.0],\n        \"t_span\": [0.0, 13100.0],\n        \"dt\": 1.0\n    },\n    \"results\": {\n        \"time\": [0, 1, 2, 3, 4, 5],\n        \"liquid_level\": [0.25, 0.251, 0.252, 0.253, 0.254, 0.255],\n        \"vam_concentration\": [1e-10, 1.1e-10, 1.2e-10, 1.3e-10, 1.4e-10, 1.5e-10],\n        \"ba_concentration\": [1e-10, 1.1e-10, 1.2e-10, 1.3e-10, 1.4e-10, 1.5e-10],\n        \"naps_concentration\": [0.0007, 0.00069, 0.00068, 0.00067, 0.00066, 0.00065],\n        \"tbhp_concentration\": [0.00042, 0.00041, 0.00040, 0.00039, 0.00038, 0.00037],\n        \"crd_concentration\": [0.00066, 0.00065, 0.00064, 0.00063, 0.00062, 0.00061],\n        \"polymer_concentration\": [1e-10, 1.2e-10, 1.4e-10, 1.6e-10, 1.8e-10, 2.0e-10],\n        \"particle_number\": [1e-10, 1.1e-10, 1.2e-10, 1.3e-10, 1.4e-10, 1.5e-10],\n        \"reactor_temperature\": [296.15, 296.2, 296.25, 296.3, 296.35, 296.4],\n        \"jacket_temperature\": [295.15, 295.2, 295.25, 295.3, 295.35, 295.4],\n        \"viscosity\": [0.001, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015],\n        \"heat_transfer_rate\": [100, 105, 110, 115, 120, 125],\n        \"heat_transfer_coeff\": [50, 52, 54, 56, 58, 60]\n    }\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": null,
+                    "body": null
+                  },
+                  "endpoint": "<<base_url>>/reactor/experiments/1",
+                  "headers": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer <<auth_token>>",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "GET",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          },
+          {
+            "v": "15",
+            "name": "Get Experiment Results",
+            "endpoint": "<<base_url>>/reactor/experiments/<<experiment_id>>/results",
+            "method": "GET",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<auth_token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"experiment_id\": 1,\n    \"results\": {\n        \"time\": [0, 1, 2, 3, 4, 5],\n        \"liquid_level\": [0.25, 0.251, 0.252, 0.253, 0.254, 0.255],\n        \"vam_concentration\": [1e-10, 1.1e-10, 1.2e-10, 1.3e-10, 1.4e-10, 1.5e-10],\n        \"ba_concentration\": [1e-10, 1.1e-10, 1.2e-10, 1.3e-10, 1.4e-10, 1.5e-10],\n        \"naps_concentration\": [0.0007, 0.00069, 0.00068, 0.00067, 0.00066, 0.00065],\n        \"tbhp_concentration\": [0.00042, 0.00041, 0.00040, 0.00039, 0.00038, 0.00037],\n        \"crd_concentration\": [0.00066, 0.00065, 0.00064, 0.00063, 0.00062, 0.00061],\n        \"polymer_concentration\": [1e-10, 1.2e-10, 1.4e-10, 1.6e-10, 1.8e-10, 2.0e-10],\n        \"particle_number\": [1e-10, 1.1e-10, 1.2e-10, 1.3e-10, 1.4e-10, 1.5e-10],\n        \"reactor_temperature\": [296.15, 296.2, 296.25, 296.3, 296.35, 296.4],\n        \"jacket_temperature\": [295.15, 295.2, 295.25, 295.3, 295.35, 295.4],\n        \"viscosity\": [0.001, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015],\n        \"heat_transfer_rate\": [100, 105, 110, 115, 120, 125],\n        \"heat_transfer_coeff\": [50, 52, 54, 56, 58, 60]\n    }\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": null,
+                    "body": null
+                  },
+                  "endpoint": "<<base_url>>/reactor/experiments/1/results",
+                  "headers": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer <<auth_token>>",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "GET",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          },
+          {
+            "v": "15",
+            "name": "Retry Failed Experiment",
+            "endpoint": "<<base_url>>/reactor/experiments/<<experiment_id>>/retry",
+            "method": "POST",
+            "headers": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <<auth_token>>",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"experiment_id\": 2,\n    \"message\": \"Experiment reset to pending for retry\"\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": null,
+                    "body": null
+                  },
+                  "endpoint": "<<base_url>>/reactor/experiments/2/retry",
+                  "headers": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer <<auth_token>>",
+                      "active": true,
+                      "description": ""
+                    }
+                  ],
+                  "method": "POST",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": [],
+        "_ref_id": "coll_me0ubjgf_38e6ca4f-d3aa-4d82-8221-0cdc836a9a06"
+      },
+      {
+        "v": 9,
+        "name": "System",
+        "folders": [],
+        "requests": [
+          {
+            "v": "15",
+            "name": "Health Check",
+            "endpoint": "<<base_url>>/health",
+            "method": "GET",
+            "headers": [],
+            "params": [],
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {
+              "Success Response": {
+                "name": "Success Response",
+                "status": "OK",
+                "body": "{\n    \"status\": \"ok\",\n    \"message\": \"API is running\"\n}",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "active": true,
+                    "description": ""
+                  }
+                ],
+                "code": 200,
+                "originalRequest": {
+                  "v": "6",
+                  "auth": {
+                    "authType": "inherit",
+                    "authActive": true
+                  },
+                  "body": {
+                    "contentType": null,
+                    "body": null
+                  },
+                  "endpoint": "<<base_url>>/health",
+                  "headers": [],
+                  "method": "GET",
+                  "name": "Success Response",
+                  "params": [],
+                  "requestVariables": []
+                }
+              }
+            },
+            "preRequestScript": "",
+            "testScript": ""
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": [],
+        "_ref_id": "coll_me0ubjgf_d676be31-3135-4d5d-adab-768f04394a69"
+      }
+    ],
+    "requests": [],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "_ref_id": "coll_me0ubjgf_de90471c-2687-4c6a-bc22-9fb5a4b28050"
+  }
+]
