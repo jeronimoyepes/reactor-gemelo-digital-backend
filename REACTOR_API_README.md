@@ -1,6 +1,6 @@
 # Reactor Simulation API
 
-This API provides endpoints for uploading reactor simulation experiments with Excel data files and processing them asynchronously.
+This API provides endpoints for uploading reactor simulation experiments with TSV data files and processing them asynchronously.
 
 ## Setup
 
@@ -77,7 +77,7 @@ Content-Type: multipart/form-data
 
 Form Data:
 - experiment_name: "My Experiment"
-- excel_file: [Excel file]
+- tsv_file: [TSV file]
 - t_add: 7380.0 (optional)
 - t_span_start: 0.0 (optional)
 - t_span_end: 13100.0 (optional)
@@ -142,7 +142,7 @@ Response:
         "id": 1,
         "user_id": 1,
         "experiment_name": "My Experiment",
-        "excel_file_path": "uploads/abc123.xlsx",
+        "tsv_file_path": "uploads/abc123.txt",
         "status": "completed",
         "number_of_tries": 1,
         "created_at": "2024-01-01T10:00:00",
@@ -218,9 +218,9 @@ Response:
 }
 ```
 
-## Excel File Format
+## TSV File Format
 
-The Excel file must contain the following columns:
+The TSV file must contain the following columns:
 
 | Column Name | Description | Units |
 |-------------|-------------|-------|
@@ -234,7 +234,7 @@ The Excel file must contain the following columns:
 | T2[K] | Cooling water inlet temperature | Kelvin |
 | T3[K] | Jacket temperature | Kelvin |
 
-### Example Excel Structure:
+### Example TSV Structure:
 ```
 t[s]    F2[m^3/s]  F7[m^3/s]  F8[m^3/s]  F9[m^3/s]  RPS[RPS]  T1[K]     T2[K]     T3[K]
 0       0.001      0.001      0.001      0.001      300       296.15    293.15    295.15
@@ -347,13 +347,13 @@ EXPERIMENT_TIMEOUT_MINUTES=20
 - If an experiment fails, the error message is stored in the database
 - Failed experiments are automatically retried up to the configured limit
 - Permanently failed experiments cannot be retried
-- File validation ensures only Excel files are accepted
+- File validation ensures only TSV files are accepted
 - Required columns are validated before processing
 - Timeout detection prevents experiments from getting stuck
 
 ## File Storage
 
-- Excel files are stored in the `uploads/` directory (configurable via `UPLOADS_DIR`)
+- TSV files are stored in the `uploads/` directory (configurable via `UPLOADS_DIR`)
 - Files are renamed with UUIDs to prevent conflicts
 - Files are automatically cleaned up if database operations fail
 

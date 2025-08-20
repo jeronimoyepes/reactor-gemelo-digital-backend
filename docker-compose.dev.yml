@@ -1,15 +1,19 @@
+version: '3.8'
+
 services:
   reactor-backend:
-    build: .
-    container_name: reactor-backend
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: reactor-backend-dev
     ports:
       - "${PORT:-8080}:8080"
       - "5679:5679"  # Debug port
     environment:
       - HOST=0.0.0.0
       - PORT=8080
-      - DEBUG=${DEBUG:-true}
-      - RELOADER=${RELOADER:-true}
+      - DEBUG=true
+      - RELOADER=true
       - DB_PATH=${DB_PATH:-users.db}
       - DEFAULT_ADMIN_USERNAME=${DEFAULT_ADMIN_USERNAME:-admin}
       - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-admin123}
@@ -22,10 +26,11 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./app:/app/app  # Mount app directory for hot reloading
+      - ./requirements.txt:/app/requirements.txt  # Mount requirements for dependency changes
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s 
+      start_period: 40s

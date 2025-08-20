@@ -92,30 +92,30 @@ def get_profile():
 @app.route('/reactor/upload', method='POST')
 @require_auth
 def upload_reactor_experiment():
-    """Upload Excel file and store reactor experiment parameters"""
+    """Upload TSV file and store reactor experiment parameters"""
     
     # Get form data
     experiment_name = request.forms.get('experiment_name')
     if not experiment_name:
         raise HTTPError(400, 'Experiment name is required')
     
-    # Get Excel file
-    excel_file = request.files.get('excel_file')
-    if not excel_file:
-        raise HTTPError(400, 'Excel file is required')
+    # Get TSV file
+    tsv_file = request.files.get('tsv_file')
+    if not tsv_file:
+        raise HTTPError(400, 'TSV file is required')
     
     # Validate file type
-    if not excel_file.filename.lower().endswith(('.xlsx', '.xls')):
-        raise HTTPError(400, 'Only Excel files (.xlsx, .xls) are allowed')
+    if not tsv_file.filename.lower().endswith(('.tsv', '.txt')):
+        raise HTTPError(400, 'Only TSV files (.tsv, .txt) are allowed')
     
     # Generate unique filename
-    file_extension = os.path.splitext(excel_file.filename)[1]
+    file_extension = os.path.splitext(tsv_file.filename)[1]
     unique_filename = f"{uuid.uuid4()}{file_extension}"
     file_path = os.path.join(UPLOADS_DIR, unique_filename)
     
     # Save file
     try:
-        excel_file.save(file_path)
+        tsv_file.save(file_path)
     except Exception as e:
         raise HTTPError(500, f'Failed to save file: {str(e)}')
     
