@@ -20,6 +20,16 @@ if debug_python:
 
 app = Bottle()
 
+# Configure Bottle for larger file uploads
+app.config['multipart.memory_limit'] = int(os.getenv('UPLOAD_MEMORY_LIMIT_MB', '100')) * 1024 * 1024  # Default 100MB
+app.config['multipart.max_file_size'] = int(os.getenv('UPLOAD_MAX_FILE_SIZE_MB', '50')) * 1024 * 1024   # Default 50MB
+app.config['multipart.max_body_size'] = int(os.getenv('UPLOAD_MAX_BODY_SIZE_MB', '200')) * 1024 * 1024 # Default 200MB
+
+# Additional Bottle configurations for better file handling
+app.config['multipart.temp_dir'] = os.getenv('UPLOAD_TEMP_DIR', '/tmp')  # Use system temp directory
+app.config['multipart.backend'] = 'default'  # Use default multipart backend
+
+
 # Create uploads directory if it doesn't exist
 UPLOADS_DIR = os.getenv('UPLOADS_DIR', 'uploads')
 os.makedirs(UPLOADS_DIR, exist_ok=True)
@@ -94,86 +104,128 @@ def get_profile():
 def upload_reactor_experiment():
     """Upload TSV file and store reactor experiment parameters"""
     
-    # Get form data
-    experiment_name = request.forms.get('experiment_name')
-    if not experiment_name:
-        raise HTTPError(400, 'Experiment name is required')
-    
-    # Get TSV file
-    tsv_file = request.files.get('tsv_file')
-    if not tsv_file:
-        raise HTTPError(400, 'TSV file is required')
-    
-    # Validate file type
-    if not tsv_file.filename.lower().endswith(('.tsv', '.txt')):
-        raise HTTPError(400, 'Only TSV files (.tsv, .txt) are allowed')
-    
-    # Generate unique filename
-    file_extension = os.path.splitext(tsv_file.filename)[1]
-    unique_filename = f"{uuid.uuid4()}{file_extension}"
-    file_path = os.path.join(UPLOADS_DIR, unique_filename)
-    
-    # Save file
     try:
-        tsv_file.save(file_path)
+        # Safely check request.files and request.forms
+        try:
+            files_keys = list(request.files.keys()) if request.files else []
+            print(f"Files received: {files_keys}")
+        except Exception as e:
+            print(f"Error accessing request.files: {e}")
+            print(f"Exception type: {type(e)}")
+            import traceback
+            traceback.print_exc()
+            files_keys = []
+        
+        try:
+            forms_data = dict(request.forms) if request.forms else {}
+            print(f"Form data received: {forms_data}")
+        except Exception as e:
+            print(f"Error accessing request.forms: {e}")
+            print(f"Exception type: {type(e)}")
+            import traceback
+            traceback.print_exc()
+            forms_data = {}
+        
+        # Get form data safely
+        experiment_name = forms_data.get('experiment_name')
+        if not experiment_name:
+            raise HTTPError(400, 'Experiment name is required')
+        
+        # Get TSV file safely
+        tsv_file = request.files.get('tsv_file') if request.files else None
+        if not tsv_file:
+            raise HTTPError(400, 'TSV file is required')
+        
+        # Validate file type
+        if not tsv_file.filename.lower().endswith(('.tsv', '.txt')):
+            raise HTTPError(400, 'Only TSV files (.tsv, .txt) are allowed')
+        
+        # Check file size (if available)
+        if hasattr(tsv_file, 'file') and hasattr(tsv_file.file, 'seek'):
+            tsv_file.file.seek(0, 2)  # Seek to end
+            file_size = tsv_file.file.tell()
+            tsv_file.file.seek(0)  # Reset to beginning
+            
+            max_size = int(os.getenv('UPLOAD_MAX_FILE_SIZE_MB', '50')) * 1024 * 1024
+            if file_size > max_size:
+                raise HTTPError(400, f'File too large. Maximum size: {max_size // (1024*1024)}MB, got: {file_size // (1024*1024)}MB')
+        
+        # Generate unique filename
+        file_extension = os.path.splitext(tsv_file.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = os.path.join(UPLOADS_DIR, unique_filename)
+        
+        # Save file
+        try:
+            tsv_file.save(file_path)
+            print(f"File saved successfully to: {file_path}")
+        except Exception as e:
+            print(f"Error saving file: {e}")
+            raise HTTPError(500, f'Failed to save file: {str(e)}')
+        
+        # Create experiment in database
+        try:
+            experiment_id = db.create_reactor_experiment(request.user_id, experiment_name, file_path)
+        except Exception as e:
+            # Clean up file if database operation fails
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            raise HTTPError(500, f'Failed to create experiment: {str(e)}')
+    
+            # Store parameters
+        parameters = {}
+        
+        # Time parameters
+        t_add = request.forms.get('t_add')
+        if t_add:
+            parameters['t_add'] = float(t_add)
+        
+        t_span_start = request.forms.get('t_span_start')
+        t_span_end = request.forms.get('t_span_end')
+        if t_span_start and t_span_end:
+            parameters['t_span'] = [float(t_span_start), float(t_span_end)]
+        
+        dt = request.forms.get('dt')
+        if dt:
+            parameters['dt'] = float(dt)
+        
+        # Adjustment factors
+        f_j1 = request.forms.get('f_j1')
+        f_j2 = request.forms.get('f_j2')
+        if f_j1 and f_j2:
+            parameters['adj_factor'] = [float(f_j1), float(f_j2)]
+        
+        # Initial conditions (optional - will use defaults if not provided)
+        initial_conditions = [
+            'L_0i', 'CVAM_r0i', 'CBA_r0i', 'CNaPS_r0i', 'CTBHP_r0i', 
+            'CCRD_r0i', 'CMPOL_r0i', 'Np_r0i', 'T1_0i', 'T3_0i'
+        ]
+        
+        for param in initial_conditions:
+            value = request.forms.get(param)
+            if value:
+                parameters[param] = float(value)
+        
+        # Store parameters in database
+        if parameters:
+            if not db.store_reactor_parameters(experiment_id, parameters):
+                raise HTTPError(500, 'Failed to store experiment parameters')
+        
+        response.content_type = 'application/json'
+        return json.dumps({
+            'experiment_id': experiment_id,
+            'experiment_name': experiment_name,
+            'status': 'pending',
+            'message': 'Experiment uploaded successfully and queued for processing'
+        })
+        
+    except HTTPError:
+        # Re-raise HTTP errors as-is
+        raise
     except Exception as e:
-        raise HTTPError(500, f'Failed to save file: {str(e)}')
-    
-    # Create experiment in database
-    try:
-        experiment_id = db.create_reactor_experiment(request.user_id, experiment_name, file_path)
-    except Exception as e:
-        # Clean up file if database operation fails
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        raise HTTPError(500, f'Failed to create experiment: {str(e)}')
-    
-    # Store parameters
-    parameters = {}
-    
-    # Time parameters
-    t_add = request.forms.get('t_add')
-    if t_add:
-        parameters['t_add'] = float(t_add)
-    
-    t_span_start = request.forms.get('t_span_start')
-    t_span_end = request.forms.get('t_span_end')
-    if t_span_start and t_span_end:
-        parameters['t_span'] = [float(t_span_start), float(t_span_end)]
-    
-    dt = request.forms.get('dt')
-    if dt:
-        parameters['dt'] = float(dt)
-    
-    # Adjustment factors
-    f_j1 = request.forms.get('f_j1')
-    f_j2 = request.forms.get('f_j2')
-    if f_j1 and f_j2:
-        parameters['adj_factor'] = [float(f_j1), float(f_j2)]
-    
-    # Initial conditions (optional - will use defaults if not provided)
-    initial_conditions = [
-        'L_0i', 'CVAM_r0i', 'CBA_r0i', 'CNaPS_r0i', 'CTBHP_r0i', 
-        'CCRD_r0i', 'CMPOL_r0i', 'Np_r0i', 'T1_0i', 'T3_0i'
-    ]
-    
-    for param in initial_conditions:
-        value = request.forms.get(param)
-        if value:
-            parameters[param] = float(value)
-    
-    # Store parameters in database
-    if parameters:
-        if not db.store_reactor_parameters(experiment_id, parameters):
-            raise HTTPError(500, 'Failed to store experiment parameters')
-    
-    response.content_type = 'application/json'
-    return json.dumps({
-        'experiment_id': experiment_id,
-        'experiment_name': experiment_name,
-        'status': 'pending',
-        'message': 'Experiment uploaded successfully and queued for processing'
-    })
+        # Handle any other unexpected errors
+        print(f"Unexpected error in upload: {e}")
+        raise HTTPError(500, f'Internal server error: {str(e)}')
 
 @app.route('/reactor/experiments', method='GET')
 @require_auth
@@ -273,6 +325,7 @@ def retry_experiment(experiment_id):
 def health_check():
     response.content_type = 'application/json'
     return json.dumps({'status': 'ok', 'message': 'API is running'})
+
 
 if __name__ == '__main__':
     host = os.getenv('HOST', 'localhost')

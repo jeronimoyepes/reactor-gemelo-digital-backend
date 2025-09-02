@@ -52,7 +52,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 experiment_name TEXT NOT NULL,
-                excel_file_path TEXT NOT NULL,
+                tsv_file_path TEXT NOT NULL,
                 status TEXT DEFAULT 'pending',
                 number_of_tries INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -250,14 +250,14 @@ class DatabaseManager:
         return deleted_count
 
     # Reactor Experiment Methods
-    def create_reactor_experiment(self, user_id: int, experiment_name: str, excel_file_path: str) -> int:
+    def create_reactor_experiment(self, user_id: int, experiment_name: str, tsv_file_path: str) -> int:
         """Create a new reactor experiment and return the experiment ID"""
         conn = self.get_connection()
         cursor = conn.cursor()
         
         cursor.execute(
-            'INSERT INTO reactor_experiments (user_id, experiment_name, excel_file_path) VALUES (?, ?, ?)',
-            (user_id, experiment_name, excel_file_path)
+            'INSERT INTO reactor_experiments (user_id, experiment_name, tsv_file_path) VALUES (?, ?, ?)',
+            (user_id, experiment_name, tsv_file_path)
         )
         
         experiment_id = cursor.lastrowid
@@ -499,7 +499,7 @@ class DatabaseManager:
         cursor = conn.cursor()
         
         cursor.execute('''
-            SELECT id, user_id, experiment_name, excel_file_path, status, number_of_tries,
+            SELECT id, user_id, experiment_name, tsv_file_path, status, number_of_tries,
                    created_at, started_at, completed_at, error_message
             FROM reactor_experiments 
             WHERE id = ?
@@ -513,7 +513,7 @@ class DatabaseManager:
                 'id': row[0],
                 'user_id': row[1],
                 'experiment_name': row[2],
-                'excel_file_path': row[3],
+                'tsv_file_path': row[3],
                 'status': row[4],
                 'number_of_tries': row[5],
                 'created_at': row[6],
@@ -529,7 +529,7 @@ class DatabaseManager:
         cursor = conn.cursor()
         
         cursor.execute('''
-            SELECT id, user_id, experiment_name, excel_file_path, number_of_tries, created_at 
+            SELECT id, user_id, experiment_name, tsv_file_path, number_of_tries, created_at 
             FROM reactor_experiments 
             WHERE status = 'pending'
             ORDER BY created_at ASC
@@ -541,7 +541,7 @@ class DatabaseManager:
                 'id': row[0],
                 'user_id': row[1],
                 'experiment_name': row[2],
-                'excel_file_path': row[3],
+                'tsv_file_path': row[3],
                 'number_of_tries': row[4],
                 'created_at': row[5]
             })

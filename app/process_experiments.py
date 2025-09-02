@@ -59,13 +59,13 @@ def process_pending_experiments():
             # Get experiment parameters
             parameters = db.get_reactor_parameters(experiment['id'])
             
-            # Read Excel file
-            excel_file_path = experiment['excel_file_path']
-            if not os.path.exists(excel_file_path):
-                raise FileNotFoundError(f"Excel file not found: {excel_file_path}")
+            # Read TSV file
+            tsv_file_path = experiment['tsv_file_path'] 
+            if not os.path.exists(tsv_file_path):
+                raise FileNotFoundError(f"TSV file not found: {tsv_file_path}")
             
-            # Read Excel file and convert to the format expected by the model
-            data = pd.read_excel(excel_file_path)
+            # Read TSV file and convert to the format expected by the model
+            data = pd.read_csv(tsv_file_path, sep='\t')
             
             # Validate required columns
             required_columns = ['t[s]', 'F2[m^3/s]', 'F7[m^3/s]', 'F8[m^3/s]', 'F9[m^3/s]', 
